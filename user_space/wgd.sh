@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Author: Xianjun Jiao
+# SPDX-FileCopyrightText: 2019 UGent
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 checkModule () {
   MODULE="$1"
   if lsmod | grep "$MODULE" &> /dev/null ; then
@@ -42,26 +46,6 @@ modprobe mac80211
 PROG=sdr
 rmmod $PROG
 
-SUBMODULE=xilinx_dma
-if [ $last_input == "remote" ]
-  then
-    rm $SUBMODULE.ko
-    sync
-    wget ftp://192.168.10.1/driver/$SUBMODULE/$SUBMODULE.ko
-    sync
-fi
-rmmod $SUBMODULE
-insmod $SUBMODULE.ko
-
-#sleep 1
-
-echo check $SUBMODULE module is loaded or not
-checkModule $SUBMODULE
-if [ $? -eq 1 ]
-then
-  return
-fi
-
 # before drive ad9361, let's bring up duc and make sure dac is connected to ad9361 dma
 SUBMODULE=tx_intf
 if [ $last_input == "remote" ]
@@ -101,16 +85,16 @@ then
 fi
 sleep 1
 
-echo "set RF frontend: ant0 rx, ant1 tx"
-if [ $last_input == "remote" ]
-  then
-    rm rf_init.sh
-    sync
-    wget ftp://192.168.10.1/user_space/rf_init.sh
-    sync
-    chmod +x rf_init.sh
-    sync
-fi
+echo "set RF frontend"
+# if [ $last_input == "remote" ]
+#   then
+#     rm rf_init.sh
+#     sync
+#     wget ftp://192.168.10.1/user_space/rf_init.sh
+#     sync
+#     chmod +x rf_init.sh
+#     sync
+# fi
 ./rf_init.sh
 
 #sleep 1
@@ -214,6 +198,3 @@ dmesg
 # dmesg -c
 # sleep 0.1
 # ifconfig sdr0 up
-
-
-
